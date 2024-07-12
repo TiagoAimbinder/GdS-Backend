@@ -21,11 +21,6 @@ export default (sequelize)  => {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        mv_dateCreated: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        }, 
-
     },
     {
         sequelize,
