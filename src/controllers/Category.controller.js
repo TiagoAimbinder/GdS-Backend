@@ -4,7 +4,7 @@ import fs from 'fs'
 
 export class CategoryController {
 
-    createCategory = async (req, res, ) => {
+    createCategory = async (req, res) => {
         const cat = JSON.parse(req.body.category); 
         try {
             const category = await Category.findOne({ where: { cat_name: cat.cat_name } });
@@ -21,7 +21,7 @@ export class CategoryController {
                 return res.status(500).json({ errCode: result.errCode, err: result.err })
             };
 
-            res.status(200).json({message: 'Categoría guardada'});
+            res.status(200).json({ message: 'Categoría guardada' });
         } catch (err) {
             fs.unlinkSync(`./uploads/${cat.cat_imgPath}`);                
             res.status(500).json({ errCode: 'GS-C001' });
@@ -50,6 +50,7 @@ export class CategoryController {
 
     updateCategory = async (req, res) => {
         const cat = JSON.parse(req.body.category); 
+        
         try {
 
             const category = await Category.findOne({ where: { cat_id: cat.cat_id } });            
@@ -94,7 +95,7 @@ export class CategoryController {
             const result = await categoryService.deleteCategory(category.dataValues);
             if (result.errCode) { return res.status(400).json({ errCode: result.errCode, err: result.err })}    
 
-            res.status(200).json({message: 'Categoría eliminada correctamente'});
+            res.status(200).json({ message: 'Categoría eliminada correctamente' });
         } catch (err) { 
             res.status(500).json({ errCode: 'GS-C009' });
         }

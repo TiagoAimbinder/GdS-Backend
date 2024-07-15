@@ -62,7 +62,6 @@ export class ProductController {
             fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
             res.status(500).json({ errCode: 'GS-PR001' });
         }
-   
     };
 
     updateProduct = async (req, res) => {

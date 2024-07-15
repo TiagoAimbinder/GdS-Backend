@@ -1,10 +1,12 @@
+import multer from "multer";
 import { Router } from "express";
 import { ProductController } from "../controllers/Product.controller.js";
-import multer from "multer";
+import { ProductMiddleware } from "../middlewares/Product.middleware.js";
 
 
 const routeProduct = Router();
 const productController = new ProductController();
+const productMiddleware = new ProductMiddleware();
 
 const storage = multer.diskStorage({
     filename: (req, file, cb) => {
@@ -19,9 +21,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }).single('file')
 
 
-routeProduct.post('/create', upload, productController.createProduct);
-routeProduct.put('/update', upload, productController.updateProduct);
-routeProduct.delete('/delete/:prod_id', upload, productController.deleteProduct);
+routeProduct.post('/create', upload, productMiddleware.CreateValidation, productController.createProduct);
+routeProduct.put('/update', upload, productMiddleware.UpdateValidation, productController.updateProduct);
+routeProduct.delete('/delete/:prod_id', productMiddleware.DeleteValidation, productController.deleteProduct);
 
 
 export { routeProduct }; 

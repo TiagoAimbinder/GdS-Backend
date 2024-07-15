@@ -55,4 +55,8 @@ export class ModelProductController {
             res.status(500).json({ errCode: 'GS-MP006', err: err}); 
         }
     }; 
+
+    createModelFromWeb = (req, res) => {
+        
+    }
 }; 

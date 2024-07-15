@@ -1,6 +1,6 @@
 import { Password } from '../config/db.js'
 import { PasswordService } from '../services/Password.service.js';
-
+import bcrypt from 'bcryptjs'
 
 export class PasswordController {
 

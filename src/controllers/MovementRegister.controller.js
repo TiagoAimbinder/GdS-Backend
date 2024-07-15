@@ -4,7 +4,6 @@ import { MovementRegisterService } from "../services/MovementRegister.service.js
 
 
 export class MovementRegisterController {
-    
 
     createMovement = async (req, res) => {
 
