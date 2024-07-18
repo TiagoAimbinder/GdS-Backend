@@ -31,7 +31,7 @@ export class CategoryController {
     getAllCategories = async (req, res) => {
         try {
             const result = await Category.findAll();
-            res.status(200).json({categories: result});
+            res.status(200).json(result);
         } catch (err) {
             res.status(500).json({ errCode: 'GS-C004' });
         }
@@ -42,7 +42,7 @@ export class CategoryController {
             const { cat_id } = req.query; 
             const result = await Category.findOne({where: {cat_id: cat_id}});
             if (!result) { return res.status(400).json({ errCode: 'GS-C006' })}
-            res.status(200).json({ category: result });
+            res.status(200).json(result);
         } catch (err) {
             res.status(500).json({ errCode: 'GS-C005' });
         }

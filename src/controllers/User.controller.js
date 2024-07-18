@@ -41,13 +41,12 @@ export class UserController {
         try {
             const { usu_email, usu_password, log_ip, log_nav} = req.body;  
 
-            const user = await User.findOne({where: {usu_email: usu_email}});
+            const user = await User.findOne({where: { usu_email: usu_email }});
             if (!user) {return res.status(404).json({ errCode: 'GS-U004' })}; 
 
             const passwordController = new PasswordController();
             const passwordValid = await passwordController.validatePassword(user.dataValues.usu_id, usu_password);
 
-            console.log('Password valid: ', passwordValid);
             if (passwordValid.errCode) { return res.status(500).json({ errCode: passwordValid.errCode, err: passwordValid.err })};
             if (passwordValid === false) { return res.status(401).json({ errCode: 'GS-U006' })}
 
@@ -55,7 +54,7 @@ export class UserController {
             const usu_token = await userService.loginUser(user.dataValues.usu_id, user.dataValues.usu_email, log_ip, log_nav); 
             if (usu_token.errCode) { return res.status(500).json({ errCode: usu_token.errCode, err: usu_token.err })};
 
-            res.status(200).json({ loginStatus: passwordValid, token: usu_token})
+            res.status(200).json({ loginStatus: passwordValid, token: usu_token, usu_username: user.dataValues.usu_username})
         } catch (err) {
             res.status(500).json({ errCode: 'GS-U005'});
         }; 

@@ -7,6 +7,7 @@ export class MovementRegisterMiddleware {
     // ----------- SCHEMAS:
     CreateSchema = Joi.object({
         usu_id: Joi.number().required(),
+        prov_id: Joi.number().required(),
         mv_type: Joi.number().valid(1,2,3).required(),
         models: Joi.array().items(
             Joi.object({

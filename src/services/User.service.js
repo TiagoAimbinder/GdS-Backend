@@ -24,7 +24,7 @@ export class UserService {
 
             return token;
         } catch (err) {
-            return { errCode: 'GS-U007', err: err }
+            return { errCode: 'GS-U005', err: err }
         }
     }; 
 }; 

@@ -13,6 +13,10 @@ export default (sequelize)  => {
             type: DataTypes.INTEGER,
             allowNull: false, 
         }, 
+        prov_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false, 
+        }, 
         mv_type: {
             type: DataTypes.INTEGER,
             allowNull: false,

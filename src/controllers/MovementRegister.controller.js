@@ -1,4 +1,4 @@
-import { User, sequelize, ModelProduct } from "../config/db.js";
+import { User, sequelize, ModelProduct, Provider, Product } from "../config/db.js";
 import { DetailController } from "./Detail.controller.js";
 import { MovementRegisterService } from "../services/MovementRegister.service.js"
 
@@ -8,7 +8,7 @@ export class MovementRegisterController {
     createMovement = async (req, res) => {
 
         const transaction = await sequelize.transaction();
-        const { usu_id, mv_type, models } = req.body; 
+        const { usu_id, prov_id, mv_type, models } = req.body; 
 
         try {
             const user = await User.findOne({ where: { usu_id: usu_id }, transaction})
@@ -23,12 +23,18 @@ export class MovementRegisterController {
                 return res.status(400).json({ errCode: 'GS-MR003' })
             };
 
+            const provider = await Provider.findOne({ where: { prov_id: prov_id }, transaction})
+            if (!provider) { 
+                await transaction.rollback();
+                return res.status(400).json({ errCode: 'GS-MR006' })
+            };
+
             const detailController = new DetailController();
             const movementRegisterService = new MovementRegisterService();
 
             // ----- MOVEMENT: 
             const mv_totalAmount = models.reduce((total, elem) => total + elem.det_amount, 0);
-            const movement = await movementRegisterService.createMovement(usu_id, mv_type, mv_totalAmount, { transaction });
+            const movement = await movementRegisterService.createMovement(usu_id, prov_id, mv_type, mv_totalAmount, { transaction });
                 if (movement !== undefined && movement.errCode !== undefined) {
                     await transaction.rollback();
                     return res.status(400).json({ errCode: movement.errCode, err: movement.err })
@@ -87,5 +93,22 @@ export class MovementRegisterController {
         }
     }; 
 
+    getMovementsByProdId = async (req, res) => {
+        try {
+            const { prod_id } = req.params; 
+            const product = await Product.findOne({ where: { prod_id: prod_id }})
+            if (!product) {
+                return res.status(400).json({ errCode: 'GS-MR007' } )
+            } 
 
+            const movementRegisterService = new MovementRegisterService();
+            const result = await movementRegisterService.getMovementsByProdId(prod_id);
+            if (result !== undefined && result.errCode !== undefined) {
+                return res.status(400).json({ errCode: result.errCode, err: result.err }); 
+            }
+            res.status(200).json(result); 
+        } catch (err) {
+            res.status(500).json({ errCode: 'GS-MR008', err: err }); 
+        }
+    }; 
 }

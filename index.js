@@ -4,6 +4,8 @@ import cors from 'cors'
 import http from 'http'
 import { config } from 'dotenv'
 import { routeIndex } from './src/routes/route.Index.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 config();
 
@@ -18,6 +20,11 @@ const corsOptions = {
     credentials: true,
     optionsSuccessStatus: 200,
 }; 
+
+// Directory where the images will be stored
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // app.use(bodyParser.json());
 app.use(express.json());

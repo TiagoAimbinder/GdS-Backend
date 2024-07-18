@@ -86,8 +86,11 @@ export class ProductController {
                 return res.status(400).json({ errCode: 'GS-PR002' });
             }
 
+            let prod_imgPath = null; 
+            product.prod_imgPath === null ? prod_imgPath = productDb.dataValues.prod_imgPath : prod_imgPath = product.prod_imgPath;
+
             const productService = new ProductService();
-            const result = await productService.updateProduct(product, prod_imgPath, imgChange);
+            const result = await productService.updateProduct(product, prod_imgPath);
 
             if (result !== undefined && result.errCode !== undefined) {
                 product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
@@ -117,4 +120,53 @@ export class ProductController {
             res.status(500).json({ errCode: 'GS-PR010'});            
         }
     }; 
+
+    getAllProducts = async (req, res) => {
+        try {
+            const product = await Product.findAll();
+            if (!product) {
+                return res.status(400).json({ errCode: 'GS-PR011' });
+            }; 
+            res.status(200).json(product);
+        } catch (err) {
+            res.status(500).json({ errCode: 'GS-PR012' });            
+        }
+    }; 
+
+    getProductById = async (req, res) => {
+        try {
+            const prod_id = req.params.prod_id; 
+            const product = await Product.findOne({ where: {prod_id: prod_id}});
+            if (!product) {
+                return res.status(400).json({ errCode: 'GS-PR009' });
+            }; 
+            res.status(200).json([product]);
+        } catch (err) {
+            res.status(500).json({ errCode: 'GS-PR012' });
+        }
+    }; 
+
+    productSelected = async (req, res) => {
+        try {
+            const prod_id = req.params.prod_id; 
+            const product = await Product.findOne({ where: {prod_id: prod_id}});
+            if (!product) {
+                return res.status(400).json({ errCode: 'GS-PR009' });
+            }; 
+
+            const productService = new ProductService(); 
+            const result = await productService.productSelected(prod_id);
+
+            res.status(200).json(result)
+        } catch (err) {
+            res.status(500).json({ errCode: 'GS-PR013'});
+        }
+    };
 }; 
+
+
+
+
+
+
+

@@ -15,7 +15,7 @@ export default (sequelize)  => {
         },
         cat_imgPath: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         }
     },
     {

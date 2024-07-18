@@ -24,6 +24,9 @@ const upload = multer({ storage: storage }).single('file')
 routeProduct.post('/create', upload, productMiddleware.CreateValidation, productController.createProduct);
 routeProduct.put('/update', upload, productMiddleware.UpdateValidation, productController.updateProduct);
 routeProduct.delete('/delete/:prod_id', productMiddleware.DeleteValidation, productController.deleteProduct);
+routeProduct.get('/getById/:prod_id',  productController.getProductById);
+routeProduct.get('/getAll',  productController.getAllProducts);
+routeProduct.get('/productSelected/:prod_id',  productController.productSelected);
 
 
 export { routeProduct }; 

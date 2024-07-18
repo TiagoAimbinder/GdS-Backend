@@ -72,18 +72,15 @@ export class ProductMiddleware {
 
     UpdateValidation = (req, res, next) => {
         const product = JSON.parse(req.body.product);
-        
         const { error } = this.UpdateSchema.validate(product);
         if (error) {
             product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
             return res.status(400).json({ errCode: 'GS-MW001', errMessage: error.details[0].message });
         }
-
         if (!req.file) {
             product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
             return res.status(400).json({ errCode: 'GS-MW002' });
         }
-
         next()
     }
 

@@ -7,5 +7,6 @@ const movementRegisterController = new MovementRegisterController();
 const movementRegisterMiddleware = new MovementRegisterMiddleware();
 
 routeMovementRegister.post('/create', movementRegisterMiddleware.CreateValidation, movementRegisterController.createMovement);
+routeMovementRegister.get('/getAllByProd/:prod_id', movementRegisterController.getMovementsByProdId);
 
 export { routeMovementRegister };
