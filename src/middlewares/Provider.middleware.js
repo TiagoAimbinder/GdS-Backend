@@ -6,7 +6,7 @@ export class ProviderMiddleware {
     // ----------- SCHEMAS:
     CreateSchema = Joi.object({
         prov_name: Joi.string().allow(null).required(),
-        prov_razonSocial: Joi.string().allow(null).required(),
+        prov_phone: Joi.string().allow(null).required(),
         prov_email: Joi.string().allow(null).required(),
         prov_cuit: Joi.string().allow(null).required(),
         prov_address: Joi.string().allow(null).required(),
@@ -15,12 +15,12 @@ export class ProviderMiddleware {
 
     UpdateSchema = Joi.object({
         prov_id: Joi.number().required(),
-        prov_name: Joi.string().required(),
-        prov_razonSocial: Joi.string().required(),
-        prov_email: Joi.string().required(),
-        prov_cuit: Joi.string().required(),
-        prov_address: Joi.string().required(),
-        prov_accountDetails: Joi.string().required(),
+        prov_name: Joi.string().allow(null).required(),
+        prov_phone: Joi.string().allow(null).required(),
+        prov_email: Joi.string().allow(null).required(),
+        prov_cuit: Joi.string().allow(null).required(),
+        prov_address: Joi.string().allow(null).required(),
+        prov_accountDetails: Joi.string().allow(null).required(),
     })
 
     DeleteSchema = Joi.object({

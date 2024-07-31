@@ -13,10 +13,6 @@ export default (sequelize)  => {
             type: DataTypes.STRING,
             allowNull: false, 
         },
-        prov_razonSocial: {
-            type: DataTypes.STRING, 
-            allowNull: true,
-        },
         prov_cuit: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -26,6 +22,10 @@ export default (sequelize)  => {
             allowNull: true,
         },
         prov_address: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        prov_phone: {
             type: DataTypes.STRING,
             allowNull: true,
         },

@@ -50,4 +50,43 @@ export class ModelProductService {
             return { errCode: 'GS-MP006', err: err}
         }
     }
+
+    getModelUnitById = async (mod_id) => {
+        try {
+            const quantity = await sequelize.query(
+                `SELECT 
+                    COALESCE(SUM(CASE 
+                        WHEN mr.mv_type = 1 THEN d.det_quantity 
+                        WHEN mr.mv_type IN (2, 3) THEN -d.det_quantity 
+                        ELSE 0 
+                    END), 0) AS total_quantity
+                FROM 
+                    modelProducts mp
+                LEFT JOIN 
+                    details d ON mp.mod_id = d.mod_id AND d.ref_type = 1
+                LEFT JOIN 
+                    movementRegisters mr ON d.ref_id = mr.mv_id
+                WHERE 
+                    mp.mod_id = :mod_id
+                GROUP BY 
+                    mp.mod_id, mp.mod_desc, mp.mod_imgPath, mp.mod_name
+                ORDER BY 
+                    mp.mod_id;`, 
+                { replacements: { mod_id: mod_id }, type: sequelize.QueryTypes.SELECT });
+            return quantity[0]; 
+        } catch (err) {
+            return { errCode: 'GS-MP008', err: err};
+        }
+
+    }; 
+
+    createModelFromWeb = async (cat_id, prod_id, mod_name, mod_desc, mod_imgPath) => {
+        try {
+            const result = await ModelProduct.create({ cat_id: cat_id, prod_id: prod_id, mod_name: mod_name, mod_desc:mod_desc, mod_imgPath: mod_imgPath, mod_active: true });
+            return true; 
+        } catch (err) {
+            return { errCode: 'GS-MP011', err: err }
+        }
+    }; 
+    
 }

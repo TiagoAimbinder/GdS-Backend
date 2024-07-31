@@ -1,6 +1,8 @@
-import { Password, sequelize, User } from '../config/db.js';
+import { sequelize, User } from '../config/db.js';
 import { UserService } from '../services/User.service.js';
 import { PasswordController } from './Password.controller.js'; 
+import jwt from 'jsonwebtoken';
+
 
 
 export class UserController {
@@ -54,9 +56,37 @@ export class UserController {
             const usu_token = await userService.loginUser(user.dataValues.usu_id, user.dataValues.usu_email, log_ip, log_nav); 
             if (usu_token.errCode) { return res.status(500).json({ errCode: usu_token.errCode, err: usu_token.err })};
 
-            res.status(200).json({ loginStatus: passwordValid, token: usu_token, usu_username: user.dataValues.usu_username})
+            res.status(200).json({ loginStatus: passwordValid, token: usu_token, usu_id: user.dataValues.usu_id, usu_username: user.dataValues.usu_username})
         } catch (err) {
             res.status(500).json({ errCode: 'GS-U005'});
         }; 
     }   
+
+    
+    validateToken = async (req, res) => {
+        const { usu_token, usu_id } = req.query;
+
+        if (!usu_token) {
+            return res.status(403).json({ validation: false });
+        }
+    
+        try {
+        // Verifica el token
+        jwt.verify(usu_token, process.env.SECRET_KEY, async (err, decoded) => { 
+            if (err) {
+            return res.status(403).json({ validation: false });
+            }
+    
+            // Verifica en la base de datos
+            const user = await User.findOne({ where: { usu_id: usu_id } });
+            if (!user || user.dataValues.usu_token !== usu_token) {
+            return res.status(404).json({ validation: false });
+            }
+    
+            return res.status(200).json({ validation: true });
+        });
+        } catch (err) {
+        return res.status(404).json({ validation: false });
+        }
+    };
 }

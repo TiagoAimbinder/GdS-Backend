@@ -21,20 +21,19 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 }; 
 
-// Directory where the images will be stored
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// app.use(bodyParser.json());
-app.use(express.json());
 app.use(cors(corsOptions)); 
+app.use(express.json());
 
 // Handling OPTIONS requests
 app.options('*', cors(corsOptions));  
 
 // Routes API Configuration
 app.use('/', routeIndex);
+
+// Directory where the images will be stored
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3003;

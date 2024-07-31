@@ -15,6 +15,13 @@ export class ModelProductMiddleware {
         mod_id: Joi.number().required(),
     });
 
+    CreateSchema = Joi.object({
+        cat_id: Joi.number().required(),
+        prod_id: Joi.number().required(),
+        mod_name: Joi.string().required(),
+        mod_desc: Joi.string().allow(null).required(),
+        mod_imgPath: Joi.string().allow(null).required(),
+    });
 
     // ----------- VALIDATIONS:
     UpdateValidation = (req, res, next) => {
@@ -29,6 +36,7 @@ export class ModelProductMiddleware {
             model.mod_imgPath !== null ? fs.unlinkSync(`./uploads/${model.mod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
             return res.status(400).json({ errCode: 'GS-M002' });
         }
+        next()
     };  
 
     DeleteValidation = (req, res, next) => {
@@ -37,4 +45,13 @@ export class ModelProductMiddleware {
         next();
     }
 
+    CreateValidation = (req, res, next) => {
+        const model = JSON.parse(req.body.model);
+        const { error } = this.CreateSchema.validate(model);
+        if (error) {
+            model.mod_imgPath !== null ? fs.unlinkSync(`./uploads/${model.mod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+            return res.status(400).json({ errCode: 'GS-MP001', err: error.details[0].message })
+        } 
+        next();
+    }
 }; 

@@ -18,7 +18,7 @@ export class UserService {
 
     loginUser = async (usu_id, usu_email, log_ip, log_nav) => {
         try {
-            const token = jwt.sign({ username: usu_email }, process.env.SECRET_KEY, {expiresIn:'4h'});
+            const token = jwt.sign({ username: usu_email }, process.env.SECRET_KEY, {expiresIn:'8h'});
             await User.update({usu_token: token}, {where: {usu_id: usu_id}});
             await HistoryLogin.create({usu_id: usu_id, log_ip: log_ip, log_nav: log_nav}); 
 

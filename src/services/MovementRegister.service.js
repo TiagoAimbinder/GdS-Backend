@@ -40,7 +40,7 @@ export class MovementRegisterService {
                     modelProducts mp ON d.mod_id = mp.mod_id
                 JOIN 
                     products pr ON mp.prod_id = pr.prod_id
-                JOIN 
+                LEFT JOIN 
                     providers p ON mr.prov_id = p.prov_id
                 WHERE 
                     pr.prod_id = :prod_id;
@@ -69,11 +69,7 @@ export class MovementRegisterService {
                 return acc;
             }, {});
 
-            console.log(groupedResults)
-    
             return groupedResults;
-            
-            return result
         } catch (err) {
             return { errCode: 'GS-MR008', err: err }
         }

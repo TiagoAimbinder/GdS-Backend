@@ -15,4 +15,4 @@ routeIndex.use('/model', routeModelProduct);
 routeIndex.use('/provider', routeProvider);
 routeIndex.use('/movement', routeMovementRegister)
 
-export { routeIndex }
+export { routeIndex }   

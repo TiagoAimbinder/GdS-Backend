@@ -19,11 +19,6 @@ export class ProductMiddleware {
         })
     );
 
-    CreateSchemaProviders = Joi.array().items(
-        Joi.object({
-            prov_id: Joi.number().required(),
-        })
-    );
 
     UpdateSchema = Joi.object({
         prod_id: Joi.number().required(),
@@ -42,28 +37,22 @@ export class ProductMiddleware {
     CreateValidation = (req, res, next) => {
         const product = JSON.parse(req.body.product);
         const models = JSON.parse(req.body.models);
-        const providers = JSON.parse(req.body.providers); 
+        const uploadedFiles = req.files.map(file => file.filename); 
 
         const { error: errorProduct } = this.CreateSchemaProduct.validate(product);
         if (errorProduct) {
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
             return res.status(400).json({ errCode: 'GS-MW001', errMessage: errorProduct.details[0].message });
         }
 
         const { error: errorModels } = this.CreateSchemaModels.validate(models);
         if (errorModels) {
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
             return res.status(400).json({ errCode: 'GS-MW001', errMessage: errorModels.details[0].message });
         }
-        
-        const { error: errorProviders } = this.CreateSchemaProviders.validate(providers);
-        if (errorProviders) {
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-            return res.status(400).json({ errCode: 'GS-MW001', errMessage: errorProviders.details[0].message });
-        }
 
-        if (!req.file) { 
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+        if (!req.files) { 
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
             return res.status(400).json({ errCode: 'GS-MW002' });
         }   
 
@@ -84,9 +73,9 @@ export class ProductMiddleware {
         next()
     }
 
-    DeleteValidation = (req, res, next) => {
+    ProdIdValidation = (req, res, next) => {
         const { error } = this.DeleteSchema.validate(req.params)
-        if (error) return res.status(400).json({ errCode: 'GS-MW001', errMessage: error.details[0].message }); 
+        if (error) return res.status(400).json({ errCode: 'GS-MW001', errMessage: error.details[0].message });
         next();
-    }; 
+    };
 }; 

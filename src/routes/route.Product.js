@@ -2,6 +2,7 @@ import multer from "multer";
 import { Router } from "express";
 import { ProductController } from "../controllers/Product.controller.js";
 import { ProductMiddleware } from "../middlewares/Product.middleware.js";
+import { authJWT } from "../config/utils.js";
 
 
 const routeProduct = Router();
@@ -18,15 +19,31 @@ const storage = multer.diskStorage({
         cb(null, './uploads')
     },
 })
+
+
+
 const upload = multer({ storage: storage }).single('file')
 
+const storageMultiple = multer.diskStorage({
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    },
 
-routeProduct.post('/create', upload, productMiddleware.CreateValidation, productController.createProduct);
-routeProduct.put('/update', upload, productMiddleware.UpdateValidation, productController.updateProduct);
-routeProduct.delete('/delete/:prod_id', productMiddleware.DeleteValidation, productController.deleteProduct);
-routeProduct.get('/getById/:prod_id',  productController.getProductById);
-routeProduct.get('/getAll',  productController.getAllProducts);
-routeProduct.get('/productSelected/:prod_id',  productController.productSelected);
+    destination: (req, file, cb) => {
+        cb(null, './uploads')
+    },
+})
+
+const uploadMultiple = multer({ storage: storageMultiple, limits: { fileSize: 50 * 1024 * 1024 } }).array('files', 10); 
+
+
+
+routeProduct.post('/create',authJWT, uploadMultiple, productMiddleware.CreateValidation, productController.createProduct); //
+routeProduct.put('/update', authJWT, upload, productMiddleware.UpdateValidation, productController.updateProduct);
+routeProduct.delete('/delete/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.deleteProduct);
+routeProduct.get('/getById/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.getProductById);
+routeProduct.get('/getAll', authJWT, productController.getAllProducts);
+routeProduct.get('/productSelected/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.productSelected);
 
 
 export { routeProduct }; 

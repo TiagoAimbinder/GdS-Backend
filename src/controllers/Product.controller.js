@@ -1,4 +1,4 @@
-import { Product, Category, Provider, sequelize } from "../config/db.js";
+import { Product, Category, sequelize, ModelProduct } from "../config/db.js";
 import { ProductService } from "../services/Product.service.js";
 import { ModelProductController } from "./ModelProduct.controller.js";
 import fs from 'fs'
@@ -6,52 +6,44 @@ import fs from 'fs'
 export class ProductController {
 
     createProduct = async (req, res) => {
-
         const transaction = await sequelize.transaction();
+
+        const uploadedFiles = req.files.map(file => file.filename); 
         const product = JSON.parse(req.body.product);
+        const models = JSON.parse(req.body.models);
 
         try {
-            const models = JSON.parse(req.body.models);
-            const providers = JSON.parse(req.body.providers); 
             const productService = new ProductService();
             const modelProductController = new ModelProductController();
 
             const cat_id = Number(product.cat_id);
             const category = await Category.findOne({ where: { cat_id: cat_id }, transaction})
             if (!category) {
-                fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
                 await transaction.rollback(); return res.status(400).json({ errCode: 'GS-C006' });
             }
 
             // ---- PRODUCT: 
             const productName = await Product.findOne({ where: { prod_name: product.prod_name }, transaction})
-            if (productName) { await transaction.rollback(); return res.status(400).json({ errCode: 'GS-PR002' });}
-            const createdProduct = await productService.createProduct(product, { transaction });
-            if (createdProduct !== undefined && createdProduct.errCode) {
-                fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
-                await transaction.rollback(); return res.status(400).json({ errCode: createdProduct.errCode, err: createdProduct.err});
+            if (productName) { 
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
+                await transaction.rollback(); 
+                return res.status(400).json({ errCode: 'GS-PR002' });
             }
 
-            // ---- PRODUCT X PROVIDERS: 
-            if (!Array.isArray(providers) || providers.length === 0) { await transaction.rollback(); return res.status(400).json({ errCode: 'GS-PR003' }); }
-            for (const prov of providers) {
-                const providerExist = await Provider.findOne({ where: { prov_id: prov.prov_id }}, transaction);
-                if (!providerExist) {
-                    fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
-                    await transaction.rollback(); return res.status(400).json({ errCode: 'GS-PR005', prov_id: prov.prov_id}); 
-                }
-            }; 
-            const createdProdXProv = await productService.createProdXProv(createdProduct.dataValues.prod_id, providers, { transaction });
-            if (createdProdXProv !== undefined && createdProdXProv.errCode) { 
-                fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
-                await transaction.rollback(); return res.status(400).json({ errCode: createdProdXProv.errCode, err: createdProdXProv.err});
+            const createdProduct = await productService.createProduct(product, { transaction });
+            if (createdProduct !== undefined && createdProduct.errCode) {
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
+                await transaction.rollback(); 
+                return res.status(400).json({ errCode: createdProduct.errCode, err: createdProduct.err});
             }
-            
+
             // ---- MODELS: 
-            const modelsCreated = await modelProductController.createModel(createdProduct.dataValues.prod_id, models, { transaction });
+            const modelsCreated = await modelProductController.createModel(createdProduct.dataValues.prod_id,models, { transaction });
             if (modelsCreated !== undefined && modelsCreated.errCode) {
-                fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
-                await transaction.rollback(); return res.status(400).json({ errCode: modelsCreated.errCode, err: modelsCreated.err});
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
+                await transaction.rollback(); 
+                return res.status(400).json({ errCode: modelsCreated.errCode, err: modelsCreated.err});
             }
 
             await transaction.commit();
@@ -59,7 +51,7 @@ export class ProductController {
             
         } catch (err) {
             await transaction.rollback();
-            fs.unlinkSync(`./uploads/${product.prod_imgPath}`);
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
             res.status(500).json({ errCode: 'GS-PR001' });
         }
     };
@@ -123,7 +115,7 @@ export class ProductController {
 
     getAllProducts = async (req, res) => {
         try {
-            const product = await Product.findAll();
+            const product = await Product.findAll({where: {prod_active: true}});
             if (!product) {
                 return res.status(400).json({ errCode: 'GS-PR011' });
             }; 
@@ -136,7 +128,7 @@ export class ProductController {
     getProductById = async (req, res) => {
         try {
             const prod_id = req.params.prod_id; 
-            const product = await Product.findOne({ where: {prod_id: prod_id}});
+            const product = await Product.findOne({ where: {prod_id: prod_id, prod_active: true}});
             if (!product) {
                 return res.status(400).json({ errCode: 'GS-PR009' });
             }; 

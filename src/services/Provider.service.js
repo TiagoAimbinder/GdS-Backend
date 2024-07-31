@@ -6,7 +6,7 @@ export class ProviderService {
         try {
             const result = Provider.create({
                 prov_name: prov.prov_name, 
-                prov_razonSocial: prov.prov_razonSocial, 
+                prov_phone: prov.prov_phone, 
                 prov_cuit: prov.prov_cuit, 
                 prov_email: prov.prov_email, 
                 prov_address: prov.prov_address, 

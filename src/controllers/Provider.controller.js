@@ -1,5 +1,5 @@
 
-import { Provider } from '../config/db.js'
+import { Provider, sequelize } from '../config/db.js'
 import { ProviderService } from '../services/Provider.service.js';
 
 export class ProviderController { 
@@ -7,14 +7,14 @@ export class ProviderController {
     createProvider = async (req, res) => {
         try {
 
-            const { prov_name, prov_razonSocial, prov_cuit, prov_email, prov_address, prov_accountDetails } = req.body; 
+            const { prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails } = req.body; 
 
-            const provider = await Provider.findOne({ where: {prov_name: prov_name}})
+            const provider = await Provider.findOne({ where: { prov_name: prov_name }})
             if (provider) { return res.status(400).json({errCode: 'GS-PV002'})}
 
             const prov = {
                 prov_name: prov_name,
-                prov_razonSocial: prov_razonSocial,
+                prov_phone: prov_phone,
                 prov_cuit: prov_cuit,
                 prov_email: prov_email,
                 prov_address: prov_address,
@@ -86,4 +86,25 @@ export class ProviderController {
             res.status(500).json({ errCode: 'GS-PV005'})
         }
     }; 
+
+    getAllProviders = async (req, res) => {
+        try {
+            const providers = await sequelize.query(
+                `SELECT prov_id, prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails FROM Providers WHERE prov_active = 1`, 
+                { type: sequelize.QueryTypes.SELECT }
+            )
+            return res.status(200).json(providers)
+        } catch (err) {
+            res.status(500).json({ errCode: 'GS-PV006'} )
+        }
+    }; 
 }
+
+
+
+
+
+
+
+
+

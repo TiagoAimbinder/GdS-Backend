@@ -1,4 +1,4 @@
-import { Product, sequelize, ProductXProvider } from "../config/db.js";
+import { Product, sequelize, ProductXProvider, ModelProduct } from "../config/db.js";
 
 export class ProductService {
 
@@ -47,6 +47,7 @@ export class ProductService {
     deleteProduct = async (prod_id) => {
         try {
             const result = await Product.update({ prod_active: false}, { where: { prod_id: prod_id }});
+            const models = await ModelProduct.update({ mod_active: false}, { where: { prod_id: prod_id }});
             return true;
         } catch (err) {
             return { errCode: 'GS-PR011', err: err}
@@ -61,7 +62,11 @@ export class ProductService {
                     mp.mod_desc,
                     mp.mod_imgPath,
                     mp.mod_name,
-                    COALESCE(SUM(CASE WHEN mr.mv_type = 1 THEN d.det_quantity WHEN mr.mv_type IN (2, 3) THEN -d.det_quantity ELSE 0 END), 0) AS total_quantity,
+                    COALESCE(SUM(CASE 
+                        WHEN mr.mv_type = 1 THEN d.det_quantity 
+                        WHEN mr.mv_type IN (2, 3) THEN -d.det_quantity 
+                        ELSE 0 
+                    END), 0) AS total_quantity,
                     (SELECT COALESCE(SUM(d2.det_amount), 0)
                     FROM details d2
                     INNER JOIN movementRegisters mr2 ON d2.ref_id = mr2.mv_id AND d2.ref_type = 1
@@ -69,7 +74,11 @@ export class ProductService {
                     (SELECT COALESCE(SUM(d3.det_amount), 0)
                     FROM details d3
                     INNER JOIN movementRegisters mr3 ON d3.ref_id = mr3.mv_id AND d3.ref_type = 1
-                    WHERE d3.mod_id = mp.mod_id AND mr3.mv_type = 1) AS total_amount_ingresos
+                    WHERE d3.mod_id = mp.mod_id AND mr3.mv_type = 1) AS total_amount_ingresos,
+                    (SELECT COALESCE(SUM(d4.det_amount), 0)
+                    FROM details d4
+                    INNER JOIN movementRegisters mr4 ON d4.ref_id = mr4.mv_id AND d4.ref_type = 1
+                    WHERE d4.mod_id = mp.mod_id AND mr4.mv_type = 3) AS total_amount_egresosEmp
                 FROM 
                     modelProducts mp
                 LEFT JOIN 
@@ -86,7 +95,6 @@ export class ProductService {
                 replacements: { prod_id: prod_id },
                 type: sequelize.QueryTypes.SELECT
             });
-            console.log(result);
             return result
         } catch (err) {
             return { errCode: 'GS-PR013', err: err}

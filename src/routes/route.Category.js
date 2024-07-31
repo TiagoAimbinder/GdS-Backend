@@ -3,6 +3,7 @@ import multer from "multer";
 
 import { CategoryController } from "../controllers/Category.controller.js";
 import { CategoryMiddleware } from "../middlewares/Category.middleware.js";
+import { authJWT } from "../config/utils.js";
 
 const routeCategory = new Router();
 const categoryController = new CategoryController();
@@ -19,13 +20,13 @@ const storage = multer.diskStorage({
         cb(null, './uploads')
     },
 })
-const upload = multer({ storage: storage }).single('file')
+const upload = multer({ storage: storage, limits: { fileSize: 50 * 1024 * 1024 } }).single('file')
 
 
-routeCategory.post('/create', upload, categoryMiddleware.CreateValidation, categoryController.createCategory);
-routeCategory.put('/update', upload, categoryMiddleware.UpdateValidation, categoryController.updateCategory);
-routeCategory.get('/getAll', categoryController.getAllCategories);
-routeCategory.get('/getById', categoryMiddleware.GetByIdValidation, categoryController.getCategoryById);
-routeCategory.delete('/delete/:cat_id', categoryMiddleware.DeleteValidation, categoryController.deleteCategory);
+routeCategory.post('/create', authJWT, upload, categoryMiddleware.CreateValidation, categoryController.createCategory);
+routeCategory.put('/update',authJWT, upload, categoryMiddleware.UpdateValidation, categoryController.updateCategory);
+routeCategory.get('/getAll',authJWT, categoryController.getAllCategories);
+routeCategory.get('/getById',authJWT, categoryMiddleware.GetByIdValidation, categoryController.getCategoryById);
+routeCategory.delete('/delete/:cat_id',authJWT, categoryMiddleware.DeleteValidation, categoryController.deleteCategory);
 
 export { routeCategory }

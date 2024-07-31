@@ -1,4 +1,4 @@
-import { Category } from "../config/db.js";
+import { Category, ModelProduct, Product } from "../config/db.js";
 import { CategoryService } from "../services/Category.service.js";
 import fs from 'fs'
 
@@ -30,7 +30,7 @@ export class CategoryController {
 
     getAllCategories = async (req, res) => {
         try {
-            const result = await Category.findAll();
+            const result = await Category.findAll({where: {cat_active: true}});
             res.status(200).json(result);
         } catch (err) {
             res.status(500).json({ errCode: 'GS-C004' });
@@ -40,7 +40,7 @@ export class CategoryController {
     getCategoryById = async (req, res) => {
         try {
             const { cat_id } = req.query; 
-            const result = await Category.findOne({where: {cat_id: cat_id}});
+            const result = await Category.findOne({where: {cat_id: cat_id, cat_active: true} });
             if (!result) { return res.status(400).json({ errCode: 'GS-C006' })}
             res.status(200).json(result);
         } catch (err) {
@@ -89,10 +89,13 @@ export class CategoryController {
         try {
             const { cat_id } = req.params;
             const category = await Category.findOne({ where: { cat_id: cat_id } });
-            if (!category) { return res.status(400).json({ errCode: 'GS-C006' })}
+            if (!category || category.dataValues.cat_active === false) { return res.status(400).json({ errCode: 'GS-C006' })}
+
+            const products = await Product.findAll({ where: { cat_id: cat_id } });
+            const prods_id = products.map((prod) => prod.dataValues.prod_id);
 
             const categoryService = new CategoryService();
-            const result = await categoryService.deleteCategory(category.dataValues);
+            const result = await categoryService.deleteCategory(cat_id, prods_id);
             if (result.errCode) { return res.status(400).json({ errCode: result.errCode, err: result.err })}    
 
             res.status(200).json({ message: 'Categoría eliminada correctamente' });

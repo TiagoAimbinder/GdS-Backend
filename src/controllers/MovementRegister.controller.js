@@ -17,17 +17,19 @@ export class MovementRegisterController {
                 return res.status(400).json({ errCode: 'GS-MR002' })
             }; 
 
-            const types = [1,2,3]
+            const types = [1,2,3,4]
             if (!types.includes(mv_type)) {
                 await transaction.rollback();
                 return res.status(400).json({ errCode: 'GS-MR003' })
             };
 
-            const provider = await Provider.findOne({ where: { prov_id: prov_id }, transaction})
-            if (!provider) { 
-                await transaction.rollback();
-                return res.status(400).json({ errCode: 'GS-MR006' })
-            };
+            if (mv_type === 1) {
+                const provider = await Provider.findOne({ where: { prov_id: prov_id }, transaction})
+                if (!provider) { 
+                    await transaction.rollback();
+                    return res.status(400).json({ errCode: 'GS-MR006' })
+                };
+            }
 
             const detailController = new DetailController();
             const movementRegisterService = new MovementRegisterService();
