@@ -29,18 +29,18 @@ export class ProductService {
         }
     }; 
 
-    updateProduct = async (product, prod_imgPath) => {
+    updateProduct = async (product, transaction) => {
         try {
             const result = await Product.update({
                 cat_id: product.cat_id,
-                prod_name: product.prod_name,
-                prod_imgPath: prod_imgPath,
-                prod_active: product.prod_active,
-            }, { where: { prod_id: product.prod_id }});
+                prod_name: product.prod_nameNew,
+                prod_imgPath: product.prod_imgPath,
+            }, 
+            { where: { prod_id: product.prod_id }}, transaction);
             return result;
 
         } catch (err) {
-            return { errCode: 'GS-PR008', err: err}
+            return { errCode: 'GS-PR001', err: err}
         }
     };
 

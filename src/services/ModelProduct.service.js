@@ -15,7 +15,7 @@ export class ModelProductService {
             }
             return true; 
         } catch (err) {
-            return { errCode: 'GS-MP002', err: err}
+            return { errCode: 'GS-MP001', err: err}
         }
     }
 

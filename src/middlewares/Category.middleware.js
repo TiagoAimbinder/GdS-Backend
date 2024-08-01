@@ -19,7 +19,8 @@ export class CategoryMiddleware {
 
     UpdateSchema = Joi.object({
         cat_id: Joi.number().required(), 
-        cat_name: Joi.string().required(),
+        cat_nameOld: Joi.string().required(),
+        cat_nameNew: Joi.string().required(),
         cat_imgPath: Joi.string().allow(null).required(), 
     });
 
@@ -40,6 +41,7 @@ export class CategoryMiddleware {
     CreateValidation = (req, res, next) => {
         const category = JSON.parse(req.body.category);
         const { error } = this.CreateSchema.validate(category);
+        
         if (error) {
             category.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.cat_imgPath}`) : fs.unlinkSync(`./uploads/null`);
             return res.status(400).json({ errCode: 'GS-M001', errMessage: error.details[0].message }); 
@@ -54,16 +56,15 @@ export class CategoryMiddleware {
     }
 
     UpdateValidation = (req, res, next) => {
-        const category = JSON.parse(req.body.category);
-        const { error } = this.UpdateSchema.validate(category);
-        if (error) {
-            category.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.cat_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-            return res.status(400).json({ errCode: 'GS-M001', errMessage: error.details[0].message });
-        }        
+        console.log('REQ BODY');
 
-        if (!req.file) { 
-            category.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.cat_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-            return res.status(400).json({ errCode: 'GS-M002' });
+        const category = JSON.parse(req.body.category);
+
+        const { error } = this.UpdateSchema.validate(category);
+
+        if (error) {
+            category.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.cat_imgPath}`) : null;
+            return res.status(400).json({ errCode: 'GS-M001', errMessage: error.details[0].message });
         }
 
         next();

@@ -12,6 +12,8 @@ const categoryMiddleware = new CategoryMiddleware();
 const storage = multer.diskStorage({
 
     filename: (req, file, cb) => {
+        console.log('REQ. BODY:', JSON.parse(req.body));
+
         const path = JSON.parse(req.body.category);
         cb(null, `${path.cat_imgPath}`)
     },

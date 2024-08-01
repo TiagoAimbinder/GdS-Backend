@@ -39,7 +39,7 @@ const uploadMultiple = multer({ storage: storageMultiple, limits: { fileSize: 50
 
 
 routeProduct.post('/create',authJWT, uploadMultiple, productMiddleware.CreateValidation, productController.createProduct); //
-routeProduct.put('/update', authJWT, upload, productMiddleware.UpdateValidation, productController.updateProduct);
+routeProduct.put('/update', authJWT, uploadMultiple, productController.updateProduct); // productMiddleware.UpdateValidation
 routeProduct.delete('/delete/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.deleteProduct);
 routeProduct.get('/getById/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.getProductById);
 routeProduct.get('/getAll', authJWT, productController.getAllProducts);

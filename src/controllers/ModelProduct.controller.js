@@ -63,7 +63,7 @@ export class ModelProductController {
             if (!category) {
                 fs.unlinkSync(`./uploads/${mod.mod_imgPath}`);
                 return res.status(404).json({ errCode: 'GS-MP009' });
-            }; 
+            };  
             const product = await Product.findOne({where: {cat_id: category.dataValues.cat_id, prod_id: mod.prod_id} })
             if (!product) {
                 fs.unlinkSync(`./uploads/${mod.mod_imgPath}`);
@@ -81,7 +81,7 @@ export class ModelProductController {
             if (result !== undefined && result.errCode !== undefined) {
                 return res.status(400).json({ errCode: result.errCode, err: result.err });
             } 
-
+            
             res.status(200).json({ message: 'Modelo creado correctamente' }); 
         } catch (err) {
             fs.unlinkSync(`./uploads/${mod.mod_imgPath}`);

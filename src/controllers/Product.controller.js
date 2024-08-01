@@ -12,6 +12,10 @@ export class ProductController {
         const product = JSON.parse(req.body.product);
         const models = JSON.parse(req.body.models);
 
+        console.log('(create) UPLOADED FILES: ', uploadedFiles);
+        console.log('(create) PRODUCT: ', product);
+        console.log('(create) MODELS: ', models);
+
         try {
             const productService = new ProductService();
             const modelProductController = new ModelProductController();
@@ -57,42 +61,71 @@ export class ProductController {
     };
 
     updateProduct = async (req, res) => {
-        const product = JSON.parse(req.body.product);
-        try {
+        const transaction = await sequelize.transaction();
 
-            const productDb = await Product.findOne({ where: { prod_id: product.prod_id }});
+        const uploadedFiles = req.files ? req.files.map(file => file.filename) : []; 
+        const product = req.body.product ? JSON.parse(req.body.product) : null;
+        const models = req.body.models ? JSON.parse(req.body.models) : null;
+
+
+        try {
+            const productService = new ProductService();
+            const modelProductController = new ModelProductController();
+
+            // Find product: 
+            const productDb = await Product.findOne({ where: { prod_id: product.prod_id }, transaction});
             if (!productDb) {
-                product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+                await transaction.rollback();
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
                 return res.status(400).json({ errCode: 'GS-PR009'})
             };     
 
-            const category = await Category.findOne({ where: { cat_id: product.cat_id }})
+            // Delete previous image
+            if (uploadedFiles.length > 0) {
+                const prodFile = uploadedFiles.some(elem => elem.includes('prod_'));
+                prodFile === true ? fs.unlinkSync(`./uploads/${productDb.dataValues.prod_imgPath}`) : null;
+            }
+
+            // Find category:
+            const category = await Category.findOne({ where: { cat_id: product.cat_id }, transaction})
             if (!category) { 
-                product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+                await transaction.rollback();
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
                 return res.status(400).json({ errCode: 'GS-C006' });
             }
 
-            const productName = await Product.findOne({ where: { prod_name: product.prod_name }})
-            if (productName) {
-                product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-                return res.status(400).json({ errCode: 'GS-PR002' });
+            // Name validation - not repeated: 
+            if (product.prod_nameNew !== product.prod_nameOld) {
+                const productName = await Product.findOne({ where: { prod_name: product.prod_nameNew, prod_active: true}, transaction})
+                if (productName) {
+                    await transaction.rollback();
+                    uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
+                    return res.status(400).json({ errCode: 'GS-PR002' });
+                }
             }
 
-            let prod_imgPath = null; 
-            product.prod_imgPath === null ? prod_imgPath = productDb.dataValues.prod_imgPath : prod_imgPath = product.prod_imgPath;
-
-            const productService = new ProductService();
-            const result = await productService.updateProduct(product, prod_imgPath);
-
-            if (result !== undefined && result.errCode !== undefined) {
-                product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-                res.status(400).json({ errCode: result.errCode, err: result.err });
+            // Create models: 
+            if (models !== null) {
+                const modelsCreated = await modelProductController.createModel(product.prod_id, models, { transaction });
+                if (modelsCreated !== undefined && modelsCreated.errCode) {
+                    uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
+                    await transaction.rollback(); 
+                    return res.status(400).json({ errCode: modelsCreated.errCode, err: modelsCreated.err});
+                }
             } 
 
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+            // Update product: 
+            const updatedProduct = await productService.updateProduct(product, { transaction });
+            if (updatedProduct !== undefined && updatedProduct.errCode !== undefined) {
+                uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
+                await transaction.rollback(); 
+                return res.status(400).json({ errCode: updatedProduct.errCode, err: updatedProduct.err });
+            } 
+
+            await transaction.commit();
             res.status(200).json({message: 'Producto actualizado correctamente.'});
         } catch (err) { 
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
             res.status(500).json({ errCode: 'GS-PR001' });
         }
     };
