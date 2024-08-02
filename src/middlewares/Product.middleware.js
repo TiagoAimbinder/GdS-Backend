@@ -19,14 +19,21 @@ export class ProductMiddleware {
         })
     );
 
-
-    UpdateSchema = Joi.object({
+    UpdateSchemaProduct = Joi.object({
         prod_id: Joi.number().required(),
         cat_id: Joi.number().required() ,
-        prod_name: Joi.string().required(),
-        prod_imgPath: Joi.string().allow(null).required(),
-        prod_active: Joi.boolean().required(),
-    });
+        prod_nameNew: Joi.string().required() ,
+        prod_nameOld: Joi.string().required() ,
+        prod_imgPath: Joi.string().required(),
+    }).allow(null);
+
+    UpdateSchemaModel = Joi.array().items(
+        Joi.object({
+            mod_name: Joi.string().required(),
+            mod_desc: Joi.string().allow(null).required(),
+            mod_imgPath: Joi.string().required(),
+        })
+    ).allow(null);
 
     DeleteSchema = Joi.object({
         prod_id: Joi.number().required(),
@@ -60,18 +67,28 @@ export class ProductMiddleware {
     }
 
     UpdateValidation = (req, res, next) => {
-        const product = JSON.parse(req.body.product);
-        const { error } = this.UpdateSchema.validate(product);
-        if (error) {
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-            return res.status(400).json({ errCode: 'GS-MW001', errMessage: error.details[0].message });
+        const product = req.body.product ? JSON.parse(req.body.product) : null;
+        const models = req.body.models ? JSON.parse(req.body.models) : null;
+        const uploadedFiles = req.files ? req.files.map(file => file.filename) : []; 
+
+        const { error: errProduct } = this.UpdateSchemaProduct.validate(product);
+        const { error: errModel } = this.UpdateSchemaModel.validate(models);
+
+        console.log('Err Product: ', errProduct);
+        console.log('Err Product: ', errModel);
+
+        if (errProduct) {
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
+            return res.status(400).json({ errCode: 'GS-MW001', errMessage: errProduct.details[0].message });
         }
-        if (!req.file) {
-            product.prod_imgPath !== null ? fs.unlinkSync(`./uploads/${product.prod_imgPath}`) : fs.unlinkSync(`./uploads/null`);
-            return res.status(400).json({ errCode: 'GS-MW002' });
+
+        if (errModel) {
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
+            return res.status(400).json({ errCode: 'GS-MW001', errMessage: errModel.details[0].message });
         }
+
         next()
-    }
+    } 
 
     ProdIdValidation = (req, res, next) => {
         const { error } = this.DeleteSchema.validate(req.params)

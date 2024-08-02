@@ -22,7 +22,10 @@ const corsOptions = {
 }; 
 
 app.use(cors(corsOptions)); 
+
+// Body parsers: 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Handling OPTIONS requests
 app.options('*', cors(corsOptions));  

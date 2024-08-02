@@ -50,7 +50,6 @@ export class CategoryController {
 
     updateCategory = async (req, res) => {
         const cat = JSON.parse(req.body.category); 
-        console.log('CAT: ', cat);
 
         try {
             const category = await Category.findOne({ where: { cat_id: cat.cat_id } });            
@@ -60,31 +59,28 @@ export class CategoryController {
             };
 
             // Name validation
-            if (cat.cat_nameOld !== cat.cat_nameNew) {
-                const categoryName = await Category.findOne({ where: { cat_name: cat.cat_nameNew, cat_active: true}});
-                if (categoryName) { 
-                    cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
-                    return res.status(400).json({ errCode: 'GS-C002' })
-                }; 
-            }
-
-            console.log('WORK');
-            return res.status(200).json({ message: 'Categoría actualizada' });
+            const categoryName = await Category.findOne({ where: { cat_name: cat.cat_name, cat_active: true}});
+            if (categoryName && cat.cat_id !== categoryName.dataValues.cat_id) { 
+                cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
+                return res.status(400).json({ errCode: 'GS-C002' })
+            }; 
 
             const updCat = {
                 cat_name: cat.cat_name,
-                cat_imgPath: cat.cat_imgPath, 
+                cat_imgPath: cat.cat_imgPath === null ? category.dataValues.cat_imgPath : cat.cat_imgPath, 
             } 
 
             const categoryService = new CategoryService();
-            const result = await categoryService.updateCategory(updCat, Number(cat.cat_id), imgChange);
-            if (result.errCode) { º
+            const result = await categoryService.updateCategory(updCat, Number(cat.cat_id));
+            if (result.errCode) { 
                 cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
                 return res.status(400).json({ errCode: result.errCode, err: result.err })
             }
 
-            cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
+            // New image validation: 
+            cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.dataValues.cat_imgPath}`) : null;
             res.status(200).json({ message: 'Categoría actualizada' });
+
         } catch (err) {
             cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
             res.status(500).json({ errCode: 'GS-C007' });

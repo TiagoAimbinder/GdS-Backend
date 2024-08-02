@@ -13,9 +13,12 @@ export class CategoryService {
         }
     } 
 
-    updateCategory = async (updCat, cat_id, imgChange) => {
+    updateCategory = async (cat, cat_id) => {
         try {
-            const category = await Category.update(updCat, { where: { cat_id: cat_id } });
+            const category = await Category.update({
+                cat_name: cat.cat_name,
+                cat_imgPath: cat.cat_imgPath,
+            }, { where: { cat_id: cat_id } });
             return true; 
         } catch (err) {    
             return { errCode: 'GS-C008', err: err}

@@ -12,10 +12,7 @@ const categoryMiddleware = new CategoryMiddleware();
 const storage = multer.diskStorage({
 
     filename: (req, file, cb) => {
-        console.log('REQ. BODY:', JSON.parse(req.body));
-
-        const path = JSON.parse(req.body.category);
-        cb(null, `${path.cat_imgPath}`)
+        cb(null, `${file.originalname}`)
     },
 
     destination: (req, file, cb) => {
@@ -26,9 +23,9 @@ const upload = multer({ storage: storage, limits: { fileSize: 50 * 1024 * 1024 }
 
 
 routeCategory.post('/create', authJWT, upload, categoryMiddleware.CreateValidation, categoryController.createCategory);
-routeCategory.put('/update',authJWT, upload, categoryMiddleware.UpdateValidation, categoryController.updateCategory);
-routeCategory.get('/getAll',authJWT, categoryController.getAllCategories);
-routeCategory.get('/getById',authJWT, categoryMiddleware.GetByIdValidation, categoryController.getCategoryById);
-routeCategory.delete('/delete/:cat_id',authJWT, categoryMiddleware.DeleteValidation, categoryController.deleteCategory);
+routeCategory.post('/update', authJWT, upload, categoryMiddleware.UpdateValidation, categoryController.updateCategory);
+routeCategory.get('/getAll', authJWT, categoryController.getAllCategories);
+routeCategory.get('/getById', authJWT, categoryMiddleware.GetByIdValidation, categoryController.getCategoryById);
+routeCategory.delete('/delete/:cat_id', authJWT, categoryMiddleware.DeleteValidation, categoryController.deleteCategory);
 
 export { routeCategory }

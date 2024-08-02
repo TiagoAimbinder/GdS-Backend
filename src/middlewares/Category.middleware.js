@@ -19,8 +19,7 @@ export class CategoryMiddleware {
 
     UpdateSchema = Joi.object({
         cat_id: Joi.number().required(), 
-        cat_nameOld: Joi.string().required(),
-        cat_nameNew: Joi.string().required(),
+        cat_name: Joi.string().required(),
         cat_imgPath: Joi.string().allow(null).required(), 
     });
 
@@ -56,14 +55,12 @@ export class CategoryMiddleware {
     }
 
     UpdateValidation = (req, res, next) => {
-        console.log('REQ BODY');
+        const cat = JSON.parse(req.body.category);
 
-        const category = JSON.parse(req.body.category);
-
-        const { error } = this.UpdateSchema.validate(category);
+        const { error } = this.UpdateSchema.validate(cat);
 
         if (error) {
-            category.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${category.cat_imgPath}`) : null;
+            cat.cat_imgPath !== null ? fs.unlinkSync(`./uploads/${cat.cat_imgPath}`) : null;
             return res.status(400).json({ errCode: 'GS-M001', errMessage: error.details[0].message });
         }
 

@@ -37,9 +37,8 @@ const storageMultiple = multer.diskStorage({
 const uploadMultiple = multer({ storage: storageMultiple, limits: { fileSize: 50 * 1024 * 1024 } }).array('files', 10); 
 
 
-
-routeProduct.post('/create',authJWT, uploadMultiple, productMiddleware.CreateValidation, productController.createProduct); //
-routeProduct.put('/update', authJWT, uploadMultiple, productController.updateProduct); // productMiddleware.UpdateValidation
+routeProduct.post('/create',authJWT, uploadMultiple, productMiddleware.CreateValidation, productController.createProduct); 
+routeProduct.put('/update', authJWT, uploadMultiple, productMiddleware.UpdateValidation, productController.updateProduct);  
 routeProduct.delete('/delete/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.deleteProduct);
 routeProduct.get('/getById/:prod_id', authJWT, productMiddleware.ProdIdValidation, productController.getProductById);
 routeProduct.get('/getAll', authJWT, productController.getAllProducts);
