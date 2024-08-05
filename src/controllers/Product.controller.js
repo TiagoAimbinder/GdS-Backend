@@ -12,7 +12,6 @@ export class ProductController {
         const product = JSON.parse(req.body.product);
         const models = JSON.parse(req.body.models);
 
-
         try {
             const productService = new ProductService();
             const modelProductController = new ModelProductController();
@@ -64,7 +63,7 @@ export class ProductController {
         const product = req.body.product ? JSON.parse(req.body.product) : null;
         const models = req.body.models ? JSON.parse(req.body.models) : null;
 
-        // try {
+        try {
             const productService = new ProductService();
             const modelProductController = new ModelProductController();
 
@@ -120,10 +119,10 @@ export class ProductController {
 
             await transaction.commit();
             res.status(200).json({message: 'Producto actualizado correctamente.'});
-        // } catch (err) { 
-        //     uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
-        //     res.status(500).json({ errCode: 'GS-PR001' });
-        // }
+        } catch (err) { 
+            uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);})
+            res.status(500).json({ errCode: 'GS-PR001' });
+        }
     };
 
     deleteProduct = async (req, res) => {

@@ -5,8 +5,8 @@ import { ProviderService } from '../services/Provider.service.js';
 export class ProviderController { 
 
     createProvider = async (req, res) => {
-        try {
 
+        try {
             const { prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails } = req.body; 
 
             const provider = await Provider.findOne({ where: { prov_name: prov_name }})

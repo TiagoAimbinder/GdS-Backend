@@ -74,9 +74,6 @@ export class ProductMiddleware {
         const { error: errProduct } = this.UpdateSchemaProduct.validate(product);
         const { error: errModel } = this.UpdateSchemaModel.validate(models);
 
-        console.log('Err Product: ', errProduct);
-        console.log('Err Product: ', errModel);
-
         if (errProduct) {
             uploadedFiles.forEach(fileName => { fs.unlinkSync(`./uploads/${fileName}`);});
             return res.status(400).json({ errCode: 'GS-MW001', errMessage: errProduct.details[0].message });
