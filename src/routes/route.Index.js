@@ -5,6 +5,7 @@ import { routeProduct } from "./route.Product.js";
 import { routeModelProduct } from "./route.ModelProduct.js";
 import { routeProvider } from "./route.Provider.js";
 import { routeMovementRegister } from "./route.MovementRegister.js";
+import { routeOrder } from "./route.Order.js";
 
 const routeIndex = Router();
 
@@ -14,5 +15,6 @@ routeIndex.use('/product', routeProduct);
 routeIndex.use('/model', routeModelProduct);
 routeIndex.use('/provider', routeProvider);
 routeIndex.use('/movement', routeMovementRegister)
+routeIndex.use('/order', routeOrder);
 
 export { routeIndex }   

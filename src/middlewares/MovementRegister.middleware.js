@@ -18,11 +18,22 @@ export class MovementRegisterMiddleware {
         ).required()
     }); 
 
+    ProdIdSchema = Joi.object({
+        prod_id: Joi.number().required()
+    });
+
+
 
     // ----------- VALIDATIONS:
     CreateValidation = (req, res, next) => {
         const { error } = this.CreateSchema.validate(req.body);
         if (error) return res.status(400).json({ errCode: 'GS-MR001', errMessage: error.details[0].message })
         next();
+    }; 
+
+    ProdIdValidation = (req, res, next) => {
+        const { error } = this.ProdIdSchema.validate(req.params);
+        if (error) return res.status(400).json({ errCode: 'GS-MR001', errMessage: error.details[0].message })
+        next(); 
     }; 
 }; 

@@ -10,7 +10,6 @@ const userMiddleware = new UserMiddleware();
 
 
 // routeUser.post('/register', userMiddleware.RegisterValidation, userController.registerUser);
-
 routeUser.post('/login', userMiddleware.LoginValidation, userController.loginUser);
 routeUser.get('/validateToken', userController.validateToken);
 

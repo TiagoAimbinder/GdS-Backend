@@ -4,10 +4,10 @@ import { MovementRegisterMiddleware } from "../middlewares/MovementRegister.midd
 import { authJWT } from "../config/utils.js";
 
 const routeMovementRegister = new Router();
-const movementRegisterController = new MovementRegisterController();
-const movementRegisterMiddleware = new MovementRegisterMiddleware();
+const movRegCtr = new MovementRegisterController();
+const movRegMwr = new MovementRegisterMiddleware();
 
-routeMovementRegister.post('/create', authJWT, movementRegisterMiddleware.CreateValidation, movementRegisterController.createMovement);
-routeMovementRegister.get('/getAllByProd/:prod_id', authJWT, movementRegisterController.getMovementsByProdId);
+routeMovementRegister.post('/create', authJWT, movRegMwr.CreateValidation, movRegCtr.createMovement);
+routeMovementRegister.get('/getAllByProd/:prod_id', authJWT, movRegMwr.ProdIdValidation, movRegCtr.getMovementsByProdId);
 
 export { routeMovementRegister };

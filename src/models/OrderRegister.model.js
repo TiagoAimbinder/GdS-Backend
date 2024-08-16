@@ -3,7 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 export default (sequelize)  => {
     class OrderRegister extends Model {}
     OrderRegister.init({
-        od_id: {
+        or_id: {
             type: DataTypes.INTEGER,
             primaryKey: true, 
             autoIncrement: true, 
@@ -13,25 +13,21 @@ export default (sequelize)  => {
             type: DataTypes.INTEGER,
             allowNull: false, 
         }, 
-        od_name: {
+        prov_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false, 
+        }, 
+        or_name: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        od_totalAmount: {
+        or_totalAmount: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        od_dateCreated: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        }, 
-        od_deliveryDate: {
+        or_deliveryDate: {
             type: DataTypes.DATE,
             allowNull: true,
-        },
-        or_status: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
         },
         or_active: {
             type: DataTypes.BOOLEAN,

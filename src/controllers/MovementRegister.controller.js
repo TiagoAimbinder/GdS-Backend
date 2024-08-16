@@ -113,4 +113,46 @@ export class MovementRegisterController {
             res.status(500).json({ errCode: 'GS-MR008', err: err }); 
         }
     }; 
+
+    registerMovFromUpd = async (or_id, usu_id, prov_id, or_totalAmount, transaction) => {
+        try {
+            const movData = await sequelize.query(`
+                SELECT 
+                    d.mod_id, 
+                    d.det_quantity, 
+                    d.det_amount
+                FROM 
+                    details d
+                JOIN 
+                    orderRegisters o ON d.ref_id = o.or_id
+                WHERE 
+                    o.or_id = ${or_id};
+            `,
+            {
+                type: sequelize.QueryTypes.SELECT,
+                transaction: transaction, 
+            })
+
+            const movRegSrv = new MovementRegisterService();
+            const detailSrv = new DetailController();
+
+            const mv_id = await movRegSrv.createMovement(usu_id, prov_id, 1, or_totalAmount, transaction);
+            if (mv_id !== undefined && mv_id.errCode !== undefined) {
+                await transaction.rollback();
+                return res.status(400).json({ errCode: mv_id.errCode, err: mv_id.err })
+            }; 
+
+            for (const mod of movData) {
+                const detail = await detailSrv.createDetail(mv_id, 1, mod.mod_id, mod.det_quantity, mod.det_amount, { transaction });
+                if (detail !== undefined && detail.errCode !== undefined) {
+                    await transaction.rollback();
+                    return res.status(400).json({ errCode: detail.errCode, err: detail.err })
+                }; 
+            }
+            
+            return true; 
+        } catch (err) {
+            return { errCode: 'GS-MR009', err: err };
+        }
+    }; 
 }

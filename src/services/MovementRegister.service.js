@@ -74,5 +74,12 @@ export class MovementRegisterService {
             return { errCode: 'GS-MR008', err: err }
         }
     }
-    
+
+    registerMovFromUpd = async (movement, transaction) => {
+        try {
+            
+        } catch (err) {
+            
+        }
+    }; 
 }

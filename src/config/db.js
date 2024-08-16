@@ -69,6 +69,12 @@ const Provider = ProviderModel(sequelize);
 import OrderRegisterModel from '../models/OrderRegister.model.js';
 const OrderRegister = OrderRegisterModel(sequelize);
 
+import OrderStatusModel from '../models/OrderStatus.model.js';
+const OrderStatus = OrderStatusModel(sequelize);
+
+import OrderStatusHistoryModel from '../models/OrderStatusHistory.model.js';
+const OrderStatusHistory = OrderStatusHistoryModel(sequelize);
+
 import StandardErrorModel from '../models/StandardError.model.js';
 const StandardError = StandardErrorModel(sequelize);
 
@@ -96,6 +102,8 @@ export {
     Category,
     StandardError,
     OrderRegister,
+    OrderStatus,
+    OrderStatusHistory,
     ProductXProvider,
     sequelize,
     connection,
