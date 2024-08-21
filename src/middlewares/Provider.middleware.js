@@ -10,6 +10,7 @@ export class ProviderMiddleware {
         prov_email: Joi.string().allow(null).required(),
         prov_cuit: Joi.string().allow(null).required(),
         prov_address: Joi.string().allow(null).required(),
+        prov_social: Joi.string().allow(null).required(),
         prov_accountDetails: Joi.string().allow(null).required(),
     })
 
@@ -20,6 +21,7 @@ export class ProviderMiddleware {
         prov_email: Joi.string().allow(null).required(),
         prov_cuit: Joi.string().allow(null).required(),
         prov_address: Joi.string().allow(null).required(),
+        prov_social: Joi.string().allow(null).required(),
         prov_accountDetails: Joi.string().allow(null).required(),
     })
 

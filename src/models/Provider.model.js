@@ -33,6 +33,10 @@ export default (sequelize)  => {
             type: DataTypes.TEXT, 
             allowNull: true,
         },
+        prov_social: {
+            type: DataTypes.STRING,
+            allowNull: true,    
+        },
         prov_active: {
             type: DataTypes.BOOLEAN, 
             allowNull: false,

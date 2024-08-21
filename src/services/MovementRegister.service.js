@@ -31,7 +31,8 @@ export class MovementRegisterService {
                     mp.mod_name,  
                     d.det_quantity,
                     d.det_amount,
-                    p.prov_name
+                    p.prov_name,
+                    p.prov_social
                 FROM 
                     movementRegisters mr
                 JOIN 
@@ -65,11 +66,12 @@ export class MovementRegisterService {
                     mv_totalAmount: curr.mv_totalAmount,
                     mv_createdAt: curr.mv_createdAt,
                     prov_name: curr.prov_name,
+                    prov_social: curr.prov_social,
                 });
                 return acc;
             }, {});
-
             return groupedResults;
+
         } catch (err) {
             return { errCode: 'GS-MR008', err: err }
         }

@@ -11,6 +11,7 @@ export class ProviderService {
                 prov_email: prov.prov_email, 
                 prov_address: prov.prov_address, 
                 prov_accountDetails: prov.prov_accountDetails,
+                prov_social: prov.prov_social,
                 prov_active: true,
             })
             return result; 

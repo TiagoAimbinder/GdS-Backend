@@ -7,10 +7,11 @@ export class ProviderController {
     createProvider = async (req, res) => {
 
         try {
-            const { prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails } = req.body; 
+            const { prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails, prov_social } = req.body; 
 
             const provider = await Provider.findOne({ where: { prov_name: prov_name }})
             if (provider) { return res.status(400).json({errCode: 'GS-PV002'})}
+
 
             const prov = {
                 prov_name: prov_name,
@@ -18,8 +19,10 @@ export class ProviderController {
                 prov_cuit: prov_cuit,
                 prov_email: prov_email,
                 prov_address: prov_address,
-                prov_accountDetails: prov_accountDetails
+                prov_accountDetails: prov_accountDetails,
+                prov_social: prov_social
             }
+
             const providerService = new ProviderService();
             const result = await providerService.createProvider(prov);
             if (result !== undefined && result.errCode !== undefined) { return res.status(400).json({errCode: result.errCode, err: result.err})}
@@ -31,7 +34,7 @@ export class ProviderController {
 
     updateProvider = async (req, res) => {
         try {
-            const { prov_id, prov_name, prov_razonSocial, prov_cuit, prov_email, prov_address, prov_accountDetails } = req.body; 
+            const { prov_id, prov_name, prov_razonSocial, prov_cuit, prov_email, prov_address, prov_accountDetails, prov_social } = req.body; 
             const provider = Provider.findOne({ where: {prov_id: prov_id}}); 
             if (!provider) { return res.status(400).json({ errCode: 'GS-PV004'})} 
 
@@ -44,7 +47,8 @@ export class ProviderController {
                 prov_cuit: prov_cuit,
                 prov_email: prov_email,
                 prov_address: prov_address,
-                prov_accountDetails: prov_accountDetails
+                prov_accountDetails: prov_accountDetails,
+                prov_social: prov_social,
             };
 
             const updatedFields = Object.keys(possibleFields)
@@ -90,7 +94,7 @@ export class ProviderController {
     getAllProviders = async (req, res) => {
         try {
             const providers = await sequelize.query(
-                `SELECT prov_id, prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails FROM Providers WHERE prov_active = 1`, 
+                `SELECT prov_id, prov_name, prov_phone, prov_cuit, prov_email, prov_address, prov_accountDetails, prov_social FROM Providers WHERE prov_active = 1`, 
                 { type: sequelize.QueryTypes.SELECT }
             )
             return res.status(200).json(providers)
